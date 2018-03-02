@@ -10,7 +10,7 @@ from py4j.java_gateway import JavaGateway
 from collections import deque
 
 ACTIONS_DIM = 9
-OBSERVATIONS_DIM = 9
+OBSERVATIONS_DIM = 10
 MAX_ITERATIONS = 10**6
 LEARNING_RATE = 0.001
 
@@ -115,9 +115,11 @@ def main():
   for episode in range(NUM_EPISODES):
     playerNumber = env.innitGame()
     jObservation = env.getState()
-
+    valueSum = 0;
+    wasNotBadMove = True
     observation = []
 
+    observation.append(1)
     for idx in range(9):
         observation.append(jObservation[idx])
 
@@ -139,17 +141,33 @@ def main():
         q_values = get_q(action_model, observation)
         action = np.argmax(q_values)
 
-        l = jvm.java.util.ArrayList()
-        l.append(playerNumber)
-        l.append(action.item())
+      l = jvm.java.util.ArrayList()
+      l.append(playerNumber)
+      l.append(action.item())
 
-        reward= env.step(l)
-        iObservation = env.getState()
-        observation = []
-        for idx in range(9):
-            observation.append(iObservation[idx])
+      reward= env.step(l)
+      valueSum += reward
+      wasNotBadMove = True
+      if reward == -2 :
+          wasNotBadMove = False
 
-        done = env.isDone()
+      #Toggle Player Number
+      if wasNotBadMove:
+        if playerNumber == 1:
+          playerNumber = 2
+        else:
+          playerNumber = 1
+
+      #print(wasNotBadMove)
+      #print(playerNumber)
+
+      iObservation = env.getState()
+      observation = []
+      observation.append(playerNumber)
+      for idx in range(9):
+        observation.append(iObservation[idx])
+
+      done = env.isDone()
 
       if done:
         # print action_model.get_weights()
@@ -158,6 +176,7 @@ def main():
         #print 'Game finished after {} iterations'.format(iteration)
         #reward = -200
         print(observation)
+        print(valueSum)
         replay.add(old_observation, action, reward, None)
         break
 

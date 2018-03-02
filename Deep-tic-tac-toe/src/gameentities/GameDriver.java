@@ -9,6 +9,8 @@ public class GameDriver {
 	
 	private int[] board = new int[9];
 	private boolean isDone = true;
+	private int winningPlayer = 0;
+	private int playCount = 0;
 	
 	public GameDriver() {
 	}
@@ -25,6 +27,8 @@ public class GameDriver {
 		board = new int[9];
 		// Swap between 1 and 2
 		isDone = false;
+		winningPlayer = 0;
+		playCount = 0;
 		return 1;
 	}
 	
@@ -37,20 +41,28 @@ public class GameDriver {
 	}
 	
 	public int step(List<Integer> playerAndSpace) {
-		if(isDone) {
-			return -5;
-		}
 		int player = playerAndSpace.get(0);
 		int space = playerAndSpace.get(1);
 		
+		if(isDone && winningPlayer != player) {
+			return -15;
+		} else if(isDone){
+			return 0;
+		}
+		
 		if (board[space] != 0) {
-			return -1;
+			return -2;
 		}
 		board[space] = player;
 		
 		if(checkWinner(player)) {
 			isDone = true;
+			winningPlayer = player;
 			return 5;
+		}
+		playCount++;
+		if (playCount >= 9) {
+			isDone = true;
 		}
 		return 0;
 	}

@@ -60,10 +60,18 @@ public class GameDriver {
 			winningPlayer = player;
 			return 5;
 		}
+
 		playCount++;
 		if (playCount >= 9) {
 			isDone = true;
 		}
+		
+		
+		badAiActivate(space);
+		if(checkWinner(2)) {
+			return -10;
+		}
+		
 		return 0;
 	}
 	
@@ -89,9 +97,16 @@ public class GameDriver {
 		if (board[5] == valuePlayed) {
 			winner = winner|validateSet(Arrays.asList(2, 5, 8));
 		}
+		
 		return winner;
 	}
 	
+	private void badAiActivate(int valuePlayed) {
+        
+		
+	}
+
+
 	private boolean validateSet(List<Integer> places) {
 		if (board[places.get(0)] == board[places.get(1)] && board[places.get(0)] == board[places.get(2)]) {
 			return true;

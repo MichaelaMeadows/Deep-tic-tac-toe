@@ -137,9 +137,17 @@ def main():
 
       if np.random.random() < random_action_probability:
         action = np.random.choice(range(ACTIONS_DIM))
+        if episode >=10000 and playerNumber == 2:
+            print(old_observation)
+            print(valueSum)
+            action = np.int64(input("Space?"))
       else:
         q_values = get_q(action_model, observation)
         action = np.argmax(q_values)
+        if episode > 10000 and playerNumber == 2:
+            print(old_observation)
+            print(valueSum)
+            action = np.int64(input("Space?"))
 
       l = jvm.java.util.ArrayList()
       l.append(playerNumber)
@@ -178,6 +186,12 @@ def main():
         print(observation)
         print(valueSum)
         replay.add(old_observation, action, reward, None)
+        if reward == 0:
+            print("good game")
+        if reward == 5:
+            modOb=old_observation
+            modOb[0]=playerNumber
+            replay.add(modOb, action, -50, None)
         break
 
       replay.add(old_observation, action, reward, observation)
